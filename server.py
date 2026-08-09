@@ -701,48 +701,6 @@ def _mcp_path(path: str) -> bool:
     return path == "/mcp" or path.startswith("/mcp/")
 
 
-class OmbreMcpBearerMiddleware:
-    """Protect remote MCP requests with a static Bearer token.
-
-    OMBRE_MCP_TOKEN is preferred; OMBRE_GATEWAY_TOKEN is the compatibility fallback
-    so existing deployments do not need another required secret.
-    """
-
-    def __init__(self, app, token: str) -> None:
-        self.app = app
-        self.token = str(token or "").strip()
-
-    async def __call__(self, scope, receive, send):
-        if (
-            scope.get("type") != "http"
-            or not self.token
-            or scope.get("method") == "OPTIONS"
-        ):
-            await self.app(scope, receive, send)
-            return
-
-        path = scope.get("path", "")
-        if _oauth_public_path(path) or not _mcp_path(path):
-            await self.app(scope, receive, send)
-            return
-
-        headers = {
-            key.decode("latin1").lower(): value.decode("latin1")
-            for key, value in scope.get("headers", [])
-        }
-        if hmac.compare_digest(_bearer_token(headers) or "", self.token):
-            await self.app(scope, receive, send)
-            return
-
-        from starlette.responses import JSONResponse
-        response = JSONResponse(
-            {"error": "invalid_token"},
-            status_code=401,
-            headers={"WWW-Authenticate": 'Bearer realm="Ombre Brain"'},
-        )
-        await response(scope, receive, send)
-
-
 def _bearer_token(headers: dict[str, str]) -> str | None:
     auth = headers.get("authorization", "")
     if not auth.lower().startswith("bearer "):
@@ -13684,13 +13642,6 @@ if __name__ == "__main__":
             provider=OMBRE_CHATGPT_OAUTH,
             protected_hosts=OMBRE_CHATGPT_OAUTH_PROTECTED_HOSTS,
         )
-        mcp_token = (
-            os.environ.get("OMBRE_MCP_TOKEN", "").strip()
-            or os.environ.get("OMBRE_GATEWAY_TOKEN", "").strip()
-        )
-        if mcp_token:
-            _app.add_middleware(OmbreMcpBearerMiddleware, token=mcp_token)
-            logger.info("Static Bearer auth enabled for Ombre MCP / Ombre MCP 已启用 Bearer 鉴权")
         logger.info("CORS middleware enabled for remote transport / 已启用 CORS 中间件")
         if OMBRE_CHATGPT_OAUTH.enabled:
             logger.info(
