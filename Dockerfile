@@ -33,6 +33,6 @@ VOLUME ["/app/buckets"]
 ENV OMBRE_TRANSPORT=streamable-http
 ENV OMBRE_BUCKETS_DIR=/app/buckets
 
-EXPOSE 8000 8010
+EXPOSE 8000
 
-CMD ["python", "run_services.py"]
+CMD ["python", "server.py"]
