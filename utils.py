@@ -378,7 +378,7 @@ def load_config(config_path: str = None) -> dict:
             "enrich_on_write": True,
             "memory_affect_anchor_enabled": True,
             "relationship_weather_affect_anchor_enabled": True,
-            "enrich_backfill_enabled": True,
+            "enrich_backfill_enabled": False,
             "enrich_backfill_limit": 5,
             "edge_backfill_limit": 5,
             "base_url": "",

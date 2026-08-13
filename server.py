@@ -13504,7 +13504,7 @@ if __name__ == "__main__":
                                 results.append(stored_activity)
                     if results:
                         logger.info("Reflection run-due results / 反思定时结果: %s", results)
-                    if reflection_cfg.get("enrich_backfill_enabled", True):
+                    if reflection_cfg.get("enrich_backfill_enabled", False):
                         backfill_result = await _backfill_memory_enrichment(
                             limit=reflection_cfg.get("enrich_backfill_limit", 5),
                             bucket_mgr_arg=local_bucket_mgr,

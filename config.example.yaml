@@ -641,7 +641,7 @@ reflection:
   enrich_on_write: true
   memory_affect_anchor_enabled: false     # legacy compatibility only; new writes do not append affect_anchor sections
   relationship_weather_affect_anchor_enabled: false  # legacy compatibility only; feel content stays body-only
-  enrich_backfill_enabled: true      # hourly scheduler backfills missing tags/confidence/edges
+  enrich_backfill_enabled: false     # opt-in: avoid hourly batch retries when model/embedding auth is unavailable
   enrich_backfill_limit: 5           # max buckets to backfill per scheduler tick
   edge_backfill_limit: 5             # default limit for manual edge_backfill; only writes memory_edges
   base_url: ""                    # empty = embedding.base_url
